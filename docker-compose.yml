@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+
+  #php_vanilla_proxy
+  php_vanilla_proxy:
+    container_name: php_vanilla_proxy
+    image: miguelrojodocker/nginx:v1
+    restart: unless-stopped
+    environment:
+      NGINX_HOST: ${NGINX_HOST}
+    tty: true
+    ports:
+      - ${NGINX_PORT}:80
+    volumes:
+      - ./:/var/www
+      - ./docker/system/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php_vanilla_app
+    networks:
+      - php_vanilla_network
+
+  #php_vanilla_app
+  php_vanilla_app:
+    container_name: php_vanilla_app
+    image: miguelrojodocker/php-fpm:v1
+    tty: true
+    volumes:
+      - ./:/var/www
+    working_dir: /var/www
+    networks:
+      - php_vanilla_network
+
+#Docker Networks
+networks:
+  php_vanilla_network:
+    driver: bridge
+    name: php_vanilla_network
